@@ -197,7 +197,7 @@ response = {
 console.log(req.body);
 
 if(req.body.media !== ''){
-  let media = new MessageMedia(,, response.media );//('image/jpeg', response.media);
+  let media = new MessageMedia('image/jpeg', response.media);
 }
 
 //console.log(response);
