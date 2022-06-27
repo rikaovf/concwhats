@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "config": "^3.3.6",
-    "express": "^4.17.1",
-    "nodemon": "^2.0.15",
-    "sharp": "^0.29.2",
-    "whatsapp-web.js": "^1.15.1"
-  }
-}
