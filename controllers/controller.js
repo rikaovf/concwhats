@@ -186,7 +186,6 @@ async function processChat(cl, req){
 
 function sendMsg(cl, req, res){
 
-  
 response = {
   id:req.body.id,
   text:req.body.text,
@@ -194,17 +193,14 @@ response = {
   media:req.body.media  
 };
 
-console.log(req.body);
 
 if(req.body.media !== ''){
-  let media = new MessageMedia('image/jpeg', response.media);
+  response.media = MessageMedia.fromFilePath(response.media);
 }
-
-//console.log(response);
 
 res.end(JSON.stringify(response));
 
-cl.sendMessage(response.id, req.body.media !== '' ? media : response.text).then((result) => {
+cl.sendMessage(response.id, req.body.media !== '' ? response.media : response.text).then((result) => {
     return result;
   })
 
