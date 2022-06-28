@@ -13,7 +13,7 @@ module.exports = () => {
 
   // MIDDLEWARES
   app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({limit: 1000000}));
 
   // ACIONANDO A PASTA DE ROTAS DO SERVIDOR DA API
   require('../routes/routes')(app);
