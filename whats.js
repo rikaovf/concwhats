@@ -15,7 +15,7 @@ exports.iniciaClient = () => {
 	const client = new Client({ puppeteer: { headless: false },
 							    authStrategy: new LocalAuth({
 									clientId: 'client-one',
-									dataPath: '/mnt/concwhats/.session'
+									dataPath: 'c:\concwhats2\concwhats'
 								})
 							 });
 	// You can use an existing session and avoid scanning a QR code by adding a "session" object to the client options.
