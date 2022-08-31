@@ -1,5 +1,7 @@
 const { MessageMedia } = require('whatsapp-web.js');
+const iconv = require('iconv-lite');
 const cl = require('../whats.js');
+
 
 client = cl.iniciaClient();
 
@@ -180,7 +182,7 @@ async function processChat(cl, req){
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////// sendTo ////////////////////////////////////////
+//////////////////////////////////////// sendTo ///////////////////////////// ///////////
 /////////////////// Função que envia mensagem ao contato desejado //////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -190,9 +192,9 @@ response = {
   id:req.body.id,
   text:req.body.text,
   type:req.body.type,
-  media:req.body.media  
+  media:req.body.media,
+  sendseen:req.body.sendseen
 };
-
 
 if(req.body.media !== ''){
   response.media = MessageMedia.fromFilePath(response.media);
@@ -200,7 +202,7 @@ if(req.body.media !== ''){
 
 res.end(JSON.stringify(response));
 
-cl.sendMessage(response.id, req.body.media !== '' ? response.media : response.text).then((result) => {
+cl.sendMessage(response.id, req.body.media !== '' ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
     return result;
   })
 
@@ -225,8 +227,6 @@ function deleteChat(cl, req, res){
     response = {
       id:req.query.id
     };
-    
-    console.log(response);
     
     res.end(JSON.stringify(response));
     
