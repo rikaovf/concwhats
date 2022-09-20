@@ -132,7 +132,9 @@ async function getMsgFromChat(cli, req, res){
   })
   
   if (finalMsg !== undefined){
-    cli.sendSeen(req.query.id);
+    if(req.query.sendseen == 'S'){
+      cli.sendSeen(req.query.id);
+    }
   }
 
   //console.log(finalMsg);
