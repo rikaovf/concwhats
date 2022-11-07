@@ -16,6 +16,7 @@ module.exports = () => {
   controller.sendMsg = (req, res) => sendMsg(client, req, res);
   controller.getUser = (req, res) => getUser(client, res);
   controller.getMsgFromChat = (req, res) => getMsgFromChat(client, req, res);
+  controller.getMsgById = (req, res) => getMsgById(client, req, res);
   controller.deleteChat =  (req, res) => deleteChat(client, req, res);
 
   return controller;
@@ -116,7 +117,7 @@ async function getMsgFromChat(cli, req, res){
   let arrMsg = [];
   let result = await processChat(cli, req);
 
-  let promisesMsg = result.map((promise) => {
+  /*let promisesMsg = result.map((promise) => {
     if(promise.hasMedia){
       return Promise.resolve(promise.downloadMedia().then((media) => {
         promise.mediaDownloaded = media;
@@ -129,9 +130,9 @@ async function getMsgFromChat(cli, req, res){
   
   let finalMsg = await Promise.all(promisesMsg).then((msg) => {
     return msg;
-  })
+  })*/
   
-  if (finalMsg !== undefined){
+  if (result !== undefined){
     if(req.query.sendseen == 'S'){
       cli.sendSeen(req.query.id);
     }
@@ -139,7 +140,37 @@ async function getMsgFromChat(cli, req, res){
 
   //console.log(finalMsg);
 
-  res.json(finalMsg);
+  res.json(result);
+  
+}
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// getMsgById ////////////////////////////////////////
+///////////////// Função que retorna a mensagem de um chat específico ///////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+async function getMsgById(cli, req, res){
+
+  let message = await cli.getMessageById(req.query.id).then((msg) => {
+    console.log(msg);
+    return msg;
+  })
+
+  let mediaDownloaded = await message.downloadMedia().then( (media) => {
+    return media;
+  })
+  
+  console.log(mediaDownloaded);
+
+  res.json(mediaDownloaded);
   
 }
 
@@ -163,6 +194,7 @@ async function processChat(cl, req){
 
   let chatMsgs = cl.getChatById(req.query.id).then((chat) => {
     let promisesMsg = chat.fetchMessages(searchOptions).then((msgs) => {
+      console.log(msgs);
       return msgs;
     })
     return promisesMsg;
