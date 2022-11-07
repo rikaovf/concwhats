@@ -10,6 +10,9 @@ module.exports = app => {
   app.route('/getmsgfromchat')
     .get(controller.getMsgFromChat);
   
+  app.route('/getmsgbyid')
+    .get(controller.getMsgById);
+
   app.route('/getuser')
     .get(controller.getUser);  
   
