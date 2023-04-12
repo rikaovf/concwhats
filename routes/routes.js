@@ -14,7 +14,10 @@ module.exports = app => {
     .get(controller.getMsgById);
 
   app.route('/getuser')
-    .get(controller.getUser);  
+    .get(controller.getUser);
+
+  app.route('/getstatus')
+    .get(controller.getStatus);    
   
     app.route('/sendmsg')
     .post(controller.sendMsg);
