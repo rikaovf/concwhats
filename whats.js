@@ -51,6 +51,8 @@ exports.iniciaClient = () => {
 	});
 	
 	client.on('ready', () => {
+    	client.ready = true;
+
     	console.log('READY');
 		
 		/*client.getChats().then(function(chats) {
