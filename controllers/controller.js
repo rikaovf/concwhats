@@ -15,6 +15,7 @@ module.exports = () => {
   controller.getAllChats = (req, res) => getAllChats(client, res);
   controller.sendMsg = (req, res) => sendMsg(client, req, res);
   controller.getUser = (req, res) => getUser(client, res);
+  controller.getStatus = (req, res) => getStatus(client, res);
   controller.getMsgFromChat = (req, res) => getMsgFromChat(client, req, res);
   controller.getMsgById = (req, res) => getMsgById(client, req, res);
   controller.deleteChat =  (req, res) => deleteChat(client, req, res);
@@ -25,12 +26,31 @@ module.exports = () => {
 
 
 
+
+
+
+async function getStatus(cli, res){
+
+  if ( cli.ready !== true ) return;
+
+  let status = await cli.getState();
+
+  res.json(status);
+  
+}
+
+
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////// getUser //////////////////////////////////////////
 /////////////// Função que retorna o numero utilizado pelo usuário //////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
 async function getUser(cli, res){
+
+  if ( cli.ready !== true ) return;
 
   let user = cli.info.wid.user;
 
@@ -52,6 +72,8 @@ async function getUser(cli, res){
 
 async function getAllMsgs(cli, res){
 
+if ( cli.ready !== true ) return;
+
 let result = await processChats(cli);
 
 res.json(result);
@@ -59,13 +81,13 @@ res.json(result);
 }
 
 
-async function processChats(cl, req){
+async function processChats(cli, req){
 
 /*let searchOptions = { 
   limit : req.body.limit ? req.body.limit : 5
 }*/
 
-let chatsMsgs = await cl.getChats().then((chat) => {
+let chatsMsgs = await cli.getChats().then((chat) => {
 
   let promisesMsg = chat.map((promise) => {
     return Promise.resolve(promise.fetchMessages(searchOptions).then((msgs) => {
@@ -92,9 +114,11 @@ return chatsMsgs;
 //////////////////// Função que retorna todos os Chats existentes //////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-async function getAllChats(cl, res){
+async function getAllChats(cli, res){
 
-  let allChats = await cl.getChats().then((chats) => {
+  if ( cli.ready !== true ) return;
+  
+  let allChats = await cli.getChats().then((chats) => {
     return chats;      
   })
   
@@ -160,7 +184,7 @@ async function getMsgFromChat(cli, req, res){
 async function getMsgById(cli, req, res){
 
   let message = await cli.getMessageById(req.query.id).then((msg) => {
-    console.log(msg);
+    //console.log(msg);
     return msg;
   })
 
@@ -168,7 +192,7 @@ async function getMsgById(cli, req, res){
     return media;
   })
   
-  console.log(mediaDownloaded);
+  //console.log(mediaDownloaded);
 
   res.json(mediaDownloaded);
   
@@ -186,15 +210,17 @@ async function getMsgById(cli, req, res){
 ///////////////// Função que retorna mensagens de um chat específico ///////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-async function processChat(cl, req){
+async function processChat(cli, req){
+
+  if ( cli.ready !== true ) return;
 
   let searchOptions = { 
     limit : req.query.limit ? req.query.limit : 5
   }
 
-  let chatMsgs = cl.getChatById(req.query.id).then((chat) => {
+  let chatMsgs = cli.getChatById(req.query.id).then((chat) => {
     let promisesMsg = chat.fetchMessages(searchOptions).then((msgs) => {
-      console.log(msgs);
+      //console.log(msgs);
       return msgs;
     })
     return promisesMsg;
@@ -220,7 +246,9 @@ async function processChat(cl, req){
 /////////////////// Função que envia mensagem ao contato desejado //////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-function sendMsg(cl, req, res){
+async function sendMsg(cli, req, res){
+
+if ( cli.ready !== true ) return;
 
 response = {
   id:req.body.id,
@@ -234,11 +262,11 @@ if(req.body.media !== ''){
   response.media = MessageMedia.fromFilePath(response.media);
 }
 
-res.end(JSON.stringify(response));
+let idmsg = await ReturnIdMessage(cli, req, response);
 
-cl.sendMessage(response.id, req.body.media !== '' ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
-    return result;
-  })
+res.json(idmsg.id.id);
+
+//res.end(JSON.stringify(response));
 
 }
 
@@ -256,17 +284,37 @@ cl.sendMessage(response.id, req.body.media !== '' ? response.media : response.te
 ////////////////////////////// Função para deletar o chat. /////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-function deleteChat(cl, req, res){
-  
+function deleteChat(cli, req, res){
+    
+    if ( cli.ready !== true ) return;
+
     response = {
       id:req.query.id
     };
     
     res.end(JSON.stringify(response));
     
-    cl.getChatById(response.id).then((chat) => {
+    cli.getChatById(response.id).then((chat) => {
       chat.delete().then((result) =>{
-        console.log(result);
+        //console.log(result);
       })    
     })
+}
+
+
+
+
+
+
+
+
+
+async function ReturnIdMessage(cli, req, response){
+
+let msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
+    return result;
+  })
+
+return msg;
+
 }
