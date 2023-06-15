@@ -311,7 +311,7 @@ function deleteChat(cli, req, res){
 
 async function ReturnIdMessage(cli, req, response){
 
-let msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
+let msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
     return result;
   })
 
