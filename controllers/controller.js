@@ -25,7 +25,12 @@ module.exports = () => {
 
 
 
-
+/*try {
+       
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => getStatus');
+      }*/
 
 
 
@@ -33,9 +38,14 @@ async function getStatus(cli, res){
 
   if ( cli.ready !== true ) return;
 
-  let status = await cli.getState();
+  try {
+          let status = await cli.getState();
 
-  res.json(status);
+          res.json(status);
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => getStatus');
+      }
   
 }
 
@@ -52,9 +62,16 @@ async function getUser(cli, res){
 
   if ( cli.ready !== true ) return;
 
-  let user = cli.info.wid.user;
+  try {
+        let user = cli.info.wid.user;
 
-  res.json(user);
+        res.json(user);     
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => getUser');
+      }
+
+  
   
   }
 
@@ -74,34 +91,43 @@ async function getAllMsgs(cli, res){
 
 if ( cli.ready !== true ) return;
 
-let result = await processChats(cli);
+try {
+      let result = await processChats(cli);
 
-res.json(result);
+      res.json(result);
+       
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => getAllMsgs');
+      }
+
 
 }
 
 
 async function processChats(cli, req){
 
-/*let searchOptions = { 
-  limit : req.body.limit ? req.body.limit : 5
-}*/
+try {
+      let chatsMsgs = await cli.getChats().then((chat) => {
 
-let chatsMsgs = await cli.getChats().then((chat) => {
+      let promisesMsg = chat.map((promise) => {
+        return Promise.resolve(promise.fetchMessages(searchOptions).then((msgs) => {
+          return msgs;
+        }))
+      })
 
-  let promisesMsg = chat.map((promise) => {
-    return Promise.resolve(promise.fetchMessages(searchOptions).then((msgs) => {
-      return msgs;
-    }))
-  })
+      return Promise.all(promisesMsg).then((msg) => {
+        return msg;
+      })
+        
+    })
 
-  return Promise.all(promisesMsg).then((msg) => {
-    return msg;
-  })
-    
-})
+    return chatsMsgs;
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => processchats');
+      }
 
-return chatsMsgs;
 
 }
 
@@ -118,11 +144,16 @@ async function getAllChats(cli, res){
 
   if ( cli.ready !== true ) return;
   
-  let allChats = await cli.getChats().then((chats) => {
-    return chats;      
-  })
-  
-  res.json(allChats);
+try {
+      let allChats = await cli.getChats().then((chats) => {
+        return chats;      
+      })
+      
+      res.json(allChats); 
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => getAllChats');
+      }
   
   }
 
@@ -138,33 +169,23 @@ async function getAllChats(cli, res){
 
 async function getMsgFromChat(cli, req, res){
 
-  let arrMsg = [];
-  let result = await processChat(cli, req);
+  try {
+      let arrMsg = [];
+      let result = await processChat(cli, req);
+      
+      if (result !== undefined){
+        if(req.query.sendseen == 'S'){
+          cli.sendSeen(req.query.id);
+        }
+      }
 
-  /*let promisesMsg = result.map((promise) => {
-    if(promise.hasMedia){
-      return Promise.resolve(promise.downloadMedia().then((media) => {
-        promise.mediaDownloaded = media;
-        return promise;
-      }))  
-    } else {
-      return promise;
-    }
-  })
+      res.json(result);
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => getMsgFromChat');
+      }
+
   
-  let finalMsg = await Promise.all(promisesMsg).then((msg) => {
-    return msg;
-  })*/
-  
-  if (result !== undefined){
-    if(req.query.sendseen == 'S'){
-      cli.sendSeen(req.query.id);
-    }
-  }
-
-  //console.log(finalMsg);
-
-  res.json(result);
   
 }
 
@@ -183,18 +204,23 @@ async function getMsgFromChat(cli, req, res){
 
 async function getMsgById(cli, req, res){
 
-  let message = await cli.getMessageById(req.query.id).then((msg) => {
-    //console.log(msg);
-    return msg;
-  })
+  try {
+       let message = await cli.getMessageById(req.query.id).then((msg) => {
+          //console.log(msg);
+          return msg;
+        })
 
-  let mediaDownloaded = await message.downloadMedia().then( (media) => {
-    return media;
-  })
-  
-  //console.log(mediaDownloaded);
+        let mediaDownloaded = await message.downloadMedia().then( (media) => {
+          return media;
+        })
+        
+        //console.log(mediaDownloaded);
 
-  res.json(mediaDownloaded);
+        res.json(mediaDownloaded);
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => getMsgByID');
+      }
   
 }
 
@@ -214,18 +240,26 @@ async function processChat(cli, req){
 
   if ( cli.ready !== true ) return;
 
-  let searchOptions = { 
-    limit : req.query.limit ? req.query.limit : 5
-  }
+  try {
+      let searchOptions = { 
+        limit : req.query.limit ? req.query.limit : 5
+      }
 
-  let chatMsgs = cli.getChatById(req.query.id).then((chat) => {
-    let promisesMsg = chat.fetchMessages(searchOptions).then((msgs) => {
-      //console.log(msgs);
-      return msgs;
-    })
-    return promisesMsg;
-  })  
-  return chatMsgs;
+      let chatMsgs = cli.getChatById(req.query.id).then((chat) => {
+        let promisesMsg = chat.fetchMessages(searchOptions).then((msgs) => {
+          //console.log(msgs);
+          return msgs;
+        })
+        return promisesMsg;
+      })  
+      return chatMsgs;
+       
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => ProcessChat');
+      }
+
+  
 }
 
 
@@ -250,21 +284,29 @@ async function sendMsg(cli, req, res){
 
 if ( cli.ready !== true ) return;
 
-response = {
-  id:req.body.id,
-  text:req.body.text,
-  type:req.body.type,
-  media:req.body.media,
-  sendseen:req.body.sendseen
-};
+try {
+       response = {
+        id:req.body.id,
+        text:req.body.text,
+        type:req.body.type,
+        media:req.body.media,
+        sendseen:req.body.sendseen
+      };
 
-if(req.body.media !== ''){
-  response.media = MessageMedia.fromFilePath(response.media);
-}
+      if(req.body.media !== ''){
+        response.media = MessageMedia.fromFilePath(response.media);
+      }
 
-let idmsg = await ReturnIdMessage(cli, req, response);
+      let idmsg = await ReturnIdMessage(cli, req, response);
 
-res.json(idmsg.id.id);
+      res.json(idmsg.id.id);
+
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => SendMsg');
+      }
+
+
 
 //res.end(JSON.stringify(response));
 
@@ -282,23 +324,31 @@ res.json(idmsg.id.id);
 ////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// DeleteChat ///////////////////////////////////////
 ////////////////////////////// Função para deletar o chat. /////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 
 function deleteChat(cli, req, res){
     
     if ( cli.ready !== true ) return;
 
-    response = {
-      id:req.query.id
-    };
+    try {
+      response = {
+        id:req.query.id
+      };
+      
+      res.end(JSON.stringify(response));
+      
+      cli.getChatById(response.id).then((chat) => {
+        chat.delete().then((result) =>{
+          //console.log(result);
+        })    
+      })
+       
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => deleteChat');
+      }
+
     
-    res.end(JSON.stringify(response));
-    
-    cli.getChatById(response.id).then((chat) => {
-      chat.delete().then((result) =>{
-        //console.log(result);
-      })    
-    })
 }
 
 
@@ -311,10 +361,16 @@ function deleteChat(cli, req, res){
 
 async function ReturnIdMessage(cli, req, response){
 
-let msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
-    return result;
-  })
+try {  
+    let msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
+        return result;
+      })
 
-return msg;
+    return msg;       
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => ReturnIdMessage');
+      }
+
 
 }
