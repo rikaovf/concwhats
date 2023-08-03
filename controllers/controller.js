@@ -361,22 +361,18 @@ function deleteChat(cli, req, res){
 
 async function ReturnIdMessage(cli, req, response){
 
-try {  
-    
-      let msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
+try {    
+      var msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
         return result;
       })
-
     } catch (e) {
         console.log(e);
         console.log('ERRO => ReturnIdMessage')  
         
-        msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
+        var msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
            return result;
         })
     } finally {
         return msg;
     }
-
-
 }
