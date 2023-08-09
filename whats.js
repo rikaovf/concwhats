@@ -1,5 +1,7 @@
 const c = require('config');
 const fs = require('fs');
+const qrcode = require('qrcode-terminal');
+
 const { Client, Location, List, Buttons, Chat, Message, LocalAuth } = require('./node_modules/whatsapp-web.js/index');
 
 const SESSION_FILE_PATH = './node_modules/whatsapp-web.js/session.json';
@@ -12,11 +14,27 @@ exports.iniciaClient = () => {
     	sessionCfg = require(SESSION_FILE_PATH);
 	}*/
 	
-	const client = new Client({ puppeteer: { headless: false },
-							    authStrategy: new LocalAuth({
+	const client = new Client({  webVersion: "2.2325.3",
+								 webVersionCache: {
+								 	type: "remote",
+								    remotePath: "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2325.3.html",
+								 	},
+								 puppeteer: { 
+								 	headless: true,
+						  	        args: [
+								      "--no-sandbox",
+								      "--no-first-run",
+								      "--disable-setuid-sandbox",
+								      "--disable-dev-shm-usage",
+								      "--disable-accelerated-2d-canvas",
+								      "--disable-gpu",
+								      "--single-process",
+								      "--no-zygote",
+							        ], },
+							   	 authStrategy: new LocalAuth({
 									clientId: 'client-one',
 									dataPath: 'c:\concwhats2\concwhats'
-								})
+									})
 							 });
 	// You can use an existing session and avoid scanning a QR code by adding a "session" object to the client options.
 	// This object must include WABrowserId, WASecretBundle, WAToken1 and WAToken2.
@@ -31,8 +49,7 @@ exports.iniciaClient = () => {
 	client.initialize();
 	
 	client.on('qr', (qr) => {
-    	// NOTE: This event will not be fired if a session is specified.
-    	console.log('QR RECEIVED', qr);
+    	qrcode.generate(qr, {small: true});    	
 	});
 	
 	client.on('authenticated', (session) => {
