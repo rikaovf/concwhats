@@ -19,6 +19,7 @@ module.exports = () => {
   controller.getMsgFromChat = (req, res) => getMsgFromChat(client, req, res);
   controller.getMsgById = (req, res) => getMsgById(client, req, res);
   controller.deleteChat =  (req, res) => deleteChat(client, req, res);
+  controller.sendSeen =  (req, res) => sendSeen(client, req, res);
 
   return controller;
 }
@@ -361,10 +362,12 @@ function deleteChat(cli, req, res){
 
 async function ReturnIdMessage(cli, req, response){
 
-try {    
+try {  
+    
       var msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
         return result;
       })
+
     } catch (e) {
         console.log(e);
         console.log('ERRO => ReturnIdMessage')  
@@ -375,4 +378,37 @@ try {
     } finally {
         return msg;
     }
+
+
+}
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// SENDSEEN /////////////////////////////////////////
+/////////////////////////// Função que torna o chat como lido ///////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+async function sendSeen(cli, req, res){
+
+  try {
+        response = {
+          id:req.body.id,
+        };
+
+        res.end(JSON.stringify(response));
+
+        if(req.body.id !== ''){
+          cli.sendSeen(req.body.id);
+        }         
+      } catch (e) {
+          console.log(e);
+          console.log('ERRO => sendSeen');
+      }
 }
