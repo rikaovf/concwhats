@@ -24,4 +24,7 @@ module.exports = app => {
       
   app.route('/deletechat')
     .post(controller.deleteChat);
+
+  app.route('/sendseen')
+    .post(controller.sendSeen); 
 }
