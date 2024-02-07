@@ -294,7 +294,7 @@ try {
         sendseen:req.body.sendseen
       };
 
-      if(req.body.media !== ''){
+      if((req.body.media !== undefined && req.body.media !== '')){
         response.media = MessageMedia.fromFilePath(response.media);
       }
 
@@ -364,7 +364,7 @@ async function ReturnIdMessage(cli, req, response){
 
 try {  
     
-      var msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
+      var msg = cli.sendMessage(response.id, (req.body.media !== undefined && req.body.media !== '') ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
         return result;
       })
 
@@ -372,7 +372,7 @@ try {
         console.log(e);
         console.log('ERRO => ReturnIdMessage')  
         
-        var msg = cli.sendMessage(response.id, req.body.media !== '' ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
+        var msg = cli.sendMessage(response.id, (req.body.media !== undefined && req.body.media !== '') ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
            return result;
         })
     } finally {
