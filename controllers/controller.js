@@ -1,6 +1,7 @@
 const { MessageMedia } = require('whatsapp-web.js');
 const iconv = require('iconv-lite');
 const cl = require('../whats.js');
+const { response } = require('express');
 
 
 client = cl.iniciaClient();
@@ -286,16 +287,22 @@ async function sendMsg(cli, req, res){
 if ( cli.ready !== true ) return;
 
 try {
-       response = {
+      console.log(req.body)    
+
+       var response = {
         id:req.body.id,
         text:req.body.text,
         type:req.body.type,
         media:req.body.media,
-        sendseen:req.body.sendseen
+        sendseen:req.body.sendseen,
+        objMedia:req.body.obj,
       };
 
-      if((req.body.media !== undefined && req.body.media !== '')){
-        response.media = MessageMedia.fromFilePath(response.media);
+      
+      if(typeof(req.body.obj) != 'undefined'){
+          response.media = new MessageMedia(req.body.obj.mimetype, req.body.obj.data, req.body.obj.filename)
+      }else if(req.body.media !== undefined && req.body.media !== ''){
+          response.media = MessageMedia.fromFilePath(response.media);
       }
 
       let idmsg = await ReturnIdMessage(cli, req, response);
@@ -363,8 +370,8 @@ function deleteChat(cli, req, res){
 async function ReturnIdMessage(cli, req, response){
 
 try {  
-    
       var msg = cli.sendMessage(response.id, (req.body.media !== undefined && req.body.media !== '') ? response.media : decodeURI( response.text ), { sendSeen: response.sendseen } ).then((result) => {
+        console.log(result);
         return result;
       })
 
@@ -373,7 +380,8 @@ try {
         console.log('ERRO => ReturnIdMessage')  
         
         var msg = cli.sendMessage(response.id, (req.body.media !== undefined && req.body.media !== '') ? response.media : response.text, { sendSeen: response.sendseen } ).then((result) => {
-           return result;
+          console.log(result); 
+          return result;
         })
     } finally {
         return msg;
@@ -391,8 +399,8 @@ try {
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////// SENDSEEN /////////////////////////////////////////
-/////////////////////////// Função que torna o chat como lido ///////////////////////////
+////////////////////////////// getMsgFromChat/ProcessChat ///////////////////////////////
+//////////////// Função que retorna as mensagens de um chat específico //////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
 async function sendSeen(cli, req, res){
@@ -412,3 +420,4 @@ async function sendSeen(cli, req, res){
           console.log('ERRO => sendSeen');
       }
 }
+
