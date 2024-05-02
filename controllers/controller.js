@@ -243,19 +243,29 @@ async function processChat(cli, req){
   if ( cli.ready !== true ) return;
 
   try {
-      let searchOptions = { 
-        limit : req.query.limit ? req.query.limit : 5
-      }
 
-      let chatMsgs = cli.getChatById(req.query.id).then((chat) => {
-        let promisesMsg = chat.fetchMessages(searchOptions).then((msgs) => {
-          //console.log(msgs);
-          return msgs;
+      var idValid = cli.isRegisteredUser(req.query.id).then((isValid) => {
+        return isValid;
+      })
+      
+      if(idValid){
+        let searchOptions = { 
+          limit : req.query.limit ? req.query.limit : 5
+        }
+  
+        let chatMsgs = cli.getChatById(req.query.id).then((chat) => {
+          let promisesMsg = chat.fetchMessages(searchOptions).then((msgs) => {
+            //console.log(msgs);
+            return msgs;
+          })
+          return promisesMsg;
         })
-        return promisesMsg;
-      })  
-      return chatMsgs;
-       
+        return chatMsgs;
+      } else{
+        console.log(`invalid WID: ${req.query.id}`)
+        return [new Object()];
+      }
+             
       } catch (e) {
           console.log(e);
           console.log('ERRO => ProcessChat');
@@ -339,7 +349,7 @@ function deleteChat(cli, req, res){
     if ( cli.ready !== true ) return;
 
     try {
-      response = {
+      var response = {
         id:req.query.id
       };
       
