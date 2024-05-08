@@ -240,7 +240,7 @@ async function getMsgById(cli, req, res){
 
 async function processChat(cli, req){
 
-  if ( cli.ready !== true ) return;
+  if ( cli.ready !== true || req.query.id.indexOf('g.us') > 0) return;
 
   try {
 
