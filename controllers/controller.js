@@ -1,3 +1,7 @@
+const fs = require('fs')
+const axios = require('axios');
+const FormData = require('form-data');
+
 const { MessageMedia } = require('whatsapp-web.js');
 const iconv = require('iconv-lite');
 const cl = require('../whats.js');
@@ -21,6 +25,7 @@ module.exports = () => {
   controller.getMsgById = (req, res) => getMsgById(client, req, res);
   controller.deleteChat =  (req, res) => deleteChat(client, req, res);
   controller.sendSeen =  (req, res) => sendSeen(client, req, res);
+  controller.analiseMedia =  (req, res) => analiseMedia(client, req, res);
 
   return controller;
 }
@@ -431,3 +436,59 @@ async function sendSeen(cli, req, res){
       }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/////////Consome a API  que analisa a foto e devolve um JSON com os componentes/////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+async function analiseMedia(client, req, res){
+  try{
+    let filepath = req.body.filepath
+    
+    if(!filepath) throw new Error('Corpo da requisição vazio!')
+
+    fs.readFile(filepath, function(err, data){        
+        if(err){
+          throw new Error(err)
+        }
+        
+        let dados = new FormData();
+        let b64 = data.toString('base64')
+
+        dados.append('photo_base64', b64)
+        
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: 'http://161.35.58.205:8080/api/v1/input',
+            headers: { 
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzI3MjgyNjAyfQ.EACSDeoLXZHSUXmlysqOvvrbo5CtJA9pliK9zMDsbTk', 
+              ...dados.getHeaders()
+            },
+            data : dados
+          };
+          
+          axios.request(config)
+          .then((response) => {
+            res.end(JSON.stringify(response.data));
+          })
+          .catch((error) => {
+            res.end(JSON.stringify({error: "Erro no retorno da leitura de imagem!"}));
+          });
+    })
+  } catch (e){
+    return res.end(JSON.stringify(e));
+  }
+}

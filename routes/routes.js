@@ -27,4 +27,7 @@ module.exports = app => {
 
   app.route('/sendseen')
     .post(controller.sendSeen); 
+
+  app.route('/analisemedia')
+    .post(controller.analiseMedia); 
 }

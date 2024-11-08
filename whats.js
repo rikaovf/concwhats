@@ -15,7 +15,7 @@ exports.iniciaClient = () => {
 	}*/
 	
 	const client = new Client({ puppeteer: { 
-					headless: true,
+					headless: false,
 					args: [
 					      "--no-sandbox",
 					      "--no-first-run",
@@ -28,8 +28,13 @@ exports.iniciaClient = () => {
 					], },
 					authStrategy: new LocalAuth({
 					clientId: 'client-one',
-					dataPath: 'c:\concwhats2\concwhats'
-					})
+					dataPath: 'c:\concwhats'
+					}), webversioncache: {
+						 type: 'remote', 
+						 remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.0.html', 
+					}  
+					
+					
 				 });
 	// You can use an existing session and avoid scanning a QR code by adding a "session" object to the client options.
 	// This object must include WABrowserId, WASecretBundle, WAToken1 and WAToken2.
