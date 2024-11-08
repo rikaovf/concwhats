@@ -25,7 +25,7 @@ module.exports = () => {
   controller.getMsgById = (req, res) => getMsgById(client, req, res);
   controller.deleteChat =  (req, res) => deleteChat(client, req, res);
   controller.sendSeen =  (req, res) => sendSeen(client, req, res);
-  controller.analiseMedia =  (req, res) => analiseMedia(client, req, res);
+  controller.analiseMedia =  (req, res) => analiseMedia(req, res);
 
   return controller;
 }
@@ -453,7 +453,7 @@ async function sendSeen(cli, req, res){
 /////////Consome a API  que analisa a foto e devolve um JSON com os componentes/////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-async function analiseMedia(client, req, res){
+async function analiseMedia(req, res){
   try{
     let filepath = req.body.filepath
     
@@ -479,16 +479,17 @@ async function analiseMedia(client, req, res){
             },
             data : dados
           };
-          
+
           axios.request(config)
           .then((response) => {
             res.end(JSON.stringify(response.data));
           })
           .catch((error) => {
-            res.end(JSON.stringify({error: "Erro no retorno da leitura de imagem!"}));
+            res.end(JSON.stringify({message: "Erro no retorno da leitura de imagem!"}));
           });
     })
   } catch (e){
-    return res.end(JSON.stringify(e));
+    console.log(e)
+    return res.end(JSON.stringify({message: e.message}));
   }
 }
